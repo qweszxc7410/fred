@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.metrics import  confusion_matrix ,accuracy_score, precision_score, recall_score, f1_score
 from function_library import load_tensor,load_pickle
 import os
-import rule_library as rule_library
+import rule_library_username as rule_library_username
 df = pd.read_csv('拐點標註檔.csv',encoding='utf-8-sig')
 
 rule_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'rule')
@@ -22,11 +22,7 @@ for rule_name in rule_list:
     merged_df[['波段低點區間', '波段高點區間']] = merged_df[['波段低點區間', '波段高點區間']].fillna(0)
     assert tensor.shape[0] == len(date_list), "日期數量不一致"
     tensor_df = pd.DataFrame(tensor, columns=[rule_name])
-
-    # Concatenate merged_df with tensor_df along columns (axis=1)
     merged_df = pd.concat([merged_df, tensor_df], axis=1)
-
-
 
     assert tensor.shape[0] == merged_df.shape[0], "合併後日期大小改變"
 
@@ -45,9 +41,11 @@ for rule_name in rule_list:
         recall = recall_score(y_true, y_pred)
         f1 = f1_score(y_true, y_pred)
         
-        obj_rule = rule_library.Rule_Library()
+        obj_rule = rule_library_username.Rule_Library()
         exec(f"obj_rule.{rule_name}()")
         
+        result_dictionary_sub['start_date'] = merged_df['Date'].max()
+        result_dictionary_sub['end_date'] = merged_df['Date'].min()
         result_dictionary_sub['LongShort'] = lonshort # 多空
         result_dictionary_sub['measure'] = obj_rule.cross_section_data_file_name
         result_dictionary_sub['rule'] = rule_name

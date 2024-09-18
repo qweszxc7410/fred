@@ -1,10 +1,10 @@
 import torch
 from function_library import *
 import os
-import rule_library as rule_library
+import rule_library_username as rule_library_username
 # GDPC1 = load_tensor(os.path.join('measure',"GDPC1","GDPC1" '.pt'),method='hdf5')
 # # GDPC1[:,0,:][-1]
-# obj_rule = rule_library.Rule_Library()
+# obj_rule = rule_library_username.Rule_Library()
 # obj_rule.rule_6()
 # data_dictionary = {'GDPC1':GDPC1}
 # print(obj_rule.get_process_variable())
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     rule_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'rule')
     
     for rule_name in build_rule_list:
-        obj_rule = rule_library.Rule_Library()
+        obj_rule = rule_library_username.Rule_Library()
         exec(f"obj_rule.{rule_name}()")
         # data_dictionary  {'變數名稱':內容}
         data_dictionary = load_data_dictionary(keys=obj_rule.cross_section_data,file_ext = 'pt',

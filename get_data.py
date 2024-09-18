@@ -26,15 +26,16 @@ class Crawl_data():
 
     def get_fred_data(self):
 
-        api_key = os.getenv('API_KEY')
-        FRED = Fred(api_key_file=None)  # 先不指定文件路徑
+        FRED = Fred(api_key_file=None)  # 先不指定文件路徑 API 從load_dotenv()讀取
 
         try:
             data_df = FRED.get_series_df(self.name,observation_start=self.observation_date,realtime_start=self.realtime_start) #, observation_start="2005-01-01", realtime_start="1998-01-01"#問題在這裡
             
         except Exception as e:
+            print(f"第一次抓{self.name}失敗，自動啟動第二次試抓")
             try:
                 data_df = FRED.get_series_df(self.name,observation_start=self.observation_date) # 可能是價格資料
+                print(f"第二次抓{self.name}成功")
             except Exception as e:
             
                 print(f"Error occurred while fetching data for {self.name}: {e}")
