@@ -49,6 +49,7 @@ class Crawl_data():
         return self.error_data
     
 if __name__ == '__main__':
+
     if 0:
         obj = Crawl_data(
             name = 'GDPC1',
@@ -69,7 +70,7 @@ if __name__ == '__main__':
         print(df)
     
     if 1:
-        symbol_list = ['GDPC1','T10YFF']
+        symbol_list = ['GDPC1','T10YFF','CORESTICKM159SFRBATL','EFFR','UNRATE','UMCSENT','MORTGAGE30US','PAYEMS','PPIACO']
         save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw_data')
         for symbol in symbol_list:
             obj = Crawl_data(
