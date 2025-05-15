@@ -57,19 +57,37 @@ def diff_record_daily_value_change(tensor,windows = 60):
 
 def percent_change_track_adjusted_values_change(tensor,windows = 60):
     ''' 每天看到所有最新數值(調整後 調整的時候會調過去)的變動  動態'''
+
     if tensor.dim() != 3:
         raise ValueError("The input tensor must be 3-dimensional.")
-    diff = torch.cat((torch.zeros(windows, tensor.size(1)), (get_diagonal_values(tensor)[windows:] -get_diagonal_values(tensor)[:-windows])), dim=0)
+        
+    # 獲取 tensor 的主對角線值
+    diagonal_values = get_diagonal_values(tensor)
+    
+    # 計算調整後的百分比變動
+    past_values = diagonal_values[:-windows]
+    current_values = diagonal_values[windows:]
+    
+    # 避免分母為零
+    percent_change = (current_values - past_values) / (past_values + 1e-8)
+    diff = torch.cat((torch.zeros(windows, tensor.size(1)), percent_change), dim=0)
+    
     result = place_data_on_three_dim_main_diagonal(diff)
-
     return result
 
-def percent_change_record_daily_value_change(tensor,windows = 60):
-    ''' 每天看到數值的變動(看到就記錄下來) 靜態'''
+def percent_change_record_daily_value_change(tensor, windows=60):
+    ''' 每天看到數值的百分比變動 (看到就記錄下來) 靜態 '''
     if tensor.dim() != 3:
         raise ValueError("The input tensor must be 3-dimensional.")
-    diff = torch.cat((torch.zeros((tensor.size(0), tensor.size(1), windows)), tensor[:, :, windows:] - tensor[:, :, :-windows]), dim=2)
-
+    
+    # 計算百分比變動
+    past_values = tensor[:, :, :-windows]
+    current_values = tensor[:, :, windows:]
+    
+    # 避免分母為零
+    percent_change = (current_values - past_values) / (past_values + 1e-8)
+    diff = torch.cat((torch.zeros((tensor.size(0), tensor.size(1), windows)), percent_change), dim=2)
+    
     return diff
 
 
@@ -128,7 +146,7 @@ def load_tensor_hdf5(path):
         with h5py.File(path, 'r') as f:
             data = f['tensor'][:]
         tensor = torch.tensor(data)
-        print(f"Tensor loaded from {path}")
+        # print(f"Tensor loaded from {path}")
         return tensor
     except Exception as e:
         print(f"Failed to load tensor from {path}: {e}")
@@ -147,7 +165,7 @@ def load_tensor_gzip(path):
     try:
         with gzip.open(path, 'rb') as f:
             tensor = torch.load(f)
-        print(f"Tensor loaded from {path}")
+        # print(f"Tensor loaded from {path}")
         return tensor
     except Exception as e:
         print(f"Failed to load tensor from {path}: {e}")

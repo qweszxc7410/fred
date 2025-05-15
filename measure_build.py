@@ -35,14 +35,11 @@ def create_tensor(symbol_files,data_path = "",save_path = ""):
     for symbol_idx, file in enumerate(symbol_files):
         print("-"*50)
         df = pd.read_csv(os.path.join(data_path,file),encoding = 'utf-8-sig')
-        
         # 將所有錯誤的日期轉換為Nan
         df['date'] = pd.to_datetime(df['date'], errors='coerce')
         df['realtime_start'] = pd.to_datetime(df['realtime_start'], errors='coerce')
         df['realtime_end'] = pd.to_datetime(df['realtime_end'], errors='coerce') # 全部都是9999-12-31會print錯誤但不影響
         today = pd.Timestamp(datetime.now().date())  # 取得今天的日期
-        
-        
         
         # 將 Nan 的值替換為今天的日期
         df['date'].fillna(today, inplace=True)
@@ -56,8 +53,13 @@ def create_tensor(symbol_files,data_path = "",save_path = ""):
         # 建立日期範圍
         date_list = pd.date_range(start=min_date, end=max_date)
         print(f"max_date:{max_date} | min_date:{min_date} |  df.shape {df.shape} | file {file}")
-        
-        if (df['realtime_start'][0] - df['date'][0] ).days > 500 : # 很晚才新增資料 才會有這麼大的差距 就採用自動修正
+        is_daily = False
+        if df['realtime_start'].equals(df['realtime_end']): # 如果是日資料
+            if len(set(df['date'])) == (len(df['date'])):
+                is_daily = True
+            else:
+                print(f"要確認 !!! symbol {file} 是不是日資料")
+        if not is_daily and (df['realtime_start'][0] - df['date'][0] ).days > 500 : # 很晚才新增資料 才會有這麼大的差距 就採用自動修正
             print(f"進入自動新增資料 symbol {file}")
             print(df.head(5))
             if 0:# 最簡單 但是在非日資料不合理
@@ -111,7 +113,10 @@ def create_tensor(symbol_files,data_path = "",save_path = ""):
             # 將資料填入 tensor 中
         # print(f"開始for loop | symbol_idx {symbol_idx} | file {file} |time {datetime.now()}")
         for _, row in df.iterrows():
-            start_pos = row['realtime_start_position']
+            if is_daily:
+                start_pos = row['date_position']
+            else:
+                start_pos = row['realtime_start_position']
             end_pos = row['realtime_end_position']
             date_pos = row['date_position']
             value = (row['value'])
