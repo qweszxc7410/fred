@@ -117,7 +117,10 @@ class RuleEvaluator:
         return results
 
     def evaluate_combined_rule(self, df, combined_rule_info):
-        df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d')
+        try:
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d')
+        except:
+            df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
         df.set_index('Date', inplace=True)
         
         rule_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rule')
@@ -258,7 +261,7 @@ class RunEvaluate:
                     rule_index=run_strategy_name.split("_")[-1],
                     longshort=longshort,
                     device = 'cpu',
-                    strategy_name =  json_files[0].split('.')[0]
+                    strategy_name =  run_strategy_name
                 )
 # 單一的rule
     def main_for_single_rule(self):
@@ -379,8 +382,12 @@ class RunEvaluate:
                     combined_rule_info = json.load(file)
                 combine_rule_list.append(combined_rule_info)
             combine_table = pd.DataFrame(combine_rule_list)
-            print(f"存檔 {os.path.join(path, f'combine_table_{longshort}.csv')}")
-            combine_table.to_csv(os.path.join(path, f"combine_table_{longshort}.csv"), encoding='utf-8-sig', index=False)
+            print(f"存檔 {os.path.join(path, f'combine_table_long.csv')}")
+            combine_table.loc[combine_table['longshort'] == 'long',:].to_csv(os.path.join(path, f"combine_table_long.csv"), encoding='utf-8-sig', index=False)
+            print(f"存檔 {os.path.join(path, f'combine_table_short.csv')}")
+            combine_table.loc[combine_table['longshort'] == 'short',:].to_csv(os.path.join(path, f"combine_table_short.csv"), encoding='utf-8-sig', index=False)
+            print(f"存檔 {os.path.join(path, f'combine_table.csv')}")
+            combine_table.to_csv(os.path.join(path, f"combine_table.csv"), encoding='utf-8-sig', index=False)
 
                         
 if __name__ == '__main__':
@@ -399,7 +406,8 @@ if __name__ == '__main__':
         obj_RunEvaluate.main_for_single_rule() # 單一rule 
         obj_RunEvaluate.build_combine_table()
     if 1: # 組合 指定的
-        run_strategy_name = ['combine_rule_long_2','combine_rule_single_long_1']
+        # run_strategy_name = ['combine_rule_long_2','combine_rule_single_long_1']
+        run_strategy_name = ['combine_rule_long_172','combine_rule_short_135']
         obj_RunEvaluate = RunEvaluate()
         obj_RunEvaluate.main_for_combine_rule(given_strategy_name = run_strategy_name) # 合併的rule
         obj_RunEvaluate.build_combine_table(given_strategy_name = run_strategy_name)

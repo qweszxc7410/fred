@@ -7,7 +7,12 @@ import torch
 from function_library import *
 from rule_build import *
 import analysis as analysis
-strategy_name_list = ['combine_rule_long_2','combine_rule_single_long_1']
+import build_upload as build_upload
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+
+strategy_name_list = ['combine_rule_long_172','combine_rule_short_135']
 rule_list = [] # 有用到那些rule
 measure_list = [] # 有用到那些measure
 
@@ -68,3 +73,10 @@ print(f"-----分析-----")
 obj_RunEvaluate = analysis.RunEvaluate()
 obj_RunEvaluate.main_for_combine_rule(given_strategy_name = strategy_name_list) # 合併的rule
 obj_RunEvaluate.build_combine_table(given_strategy_name = strategy_name_list)
+
+
+for strategy_name in strategy_name_list:
+    obj_buildupload_data = build_upload.BuildUploadData(strategy_name)
+    obj_buildupload_data.run()
+    upload = obj_buildupload_data.upload(strategy_name)
+    
