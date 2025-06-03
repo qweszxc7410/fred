@@ -10,7 +10,6 @@ class RuleCombiner:
         self.save_dir = save_dir
         self.num_combinations = num_combinations
         self.max_rules = max_rules
-        os.makedirs(self.save_dir, exist_ok=True)
 
     def load_data(self, file_path):
         try:
