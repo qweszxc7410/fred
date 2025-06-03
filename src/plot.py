@@ -8,7 +8,7 @@ class Plot():
     def __init__(self, strategy_name):
         self.strategy_name = strategy_name.replace('output_','').replace('output_single','')
         folder_name = 'output_single' if 'single' in self.strategy_name else 'output'
-        self.path = os.path.join(os.path.dirname(os.path.abspath(__file__)),folder_name)
+        self.path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data',folder_name)
         self.data= pd.read_csv(os.path.join(self.path, 'output' + "_" + self.strategy_name, "merged_df_" + self.strategy_name.replace("single_","") + ".csv"))
         self.longshort = 'long' if 'long' in self.strategy_name.lower() else 'short'
         print()
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     obj = Plot('output_single_long_1').plot() # 
     # output_long_2
-    obj = Plot('output_long_2').plot() # 
+    obj = Plot('output_single_long_3').plot() # 
     
     
     

@@ -15,7 +15,7 @@ class RuleCombiner:
     def load_data(self, file_path):
         try:
             # 讀取 CSV 並選取必要的欄位
-            path =os.path.join(os.path.dirname(os.path.abspath(__file__)))
+            path =os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
             df = pd.read_csv(os.path.join(path,file_path), encoding='utf-8-sig')
             selected_columns = ['measure_list', 'combined_rule', 'rule_descriptions', 'accuracy', 'precision', 'recall', 'f1_score','rule_number']
             df.loc[:, 'rule_number'] = df['combined_rule'].str.extract(r'(\d+)').astype(int)
@@ -58,7 +58,7 @@ class RuleCombiner:
         return combinations
 
     def save_combinations(self, combinations, folder_prefix):
-        path =os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        path =os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
         
         for i, combination in enumerate(combinations):
             
@@ -74,7 +74,7 @@ class RuleCombiner:
     def create_long_short_combinations(self):
         # 分別生成和保存 long 和 short 的組合
         for file_path, label in zip([self.long_file, self.short_file], ["long", "short"]):
-            data = self.load_data(file_path)
+            data = self.load_data(os.path.join(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data'),'output_table',file_path))
             combinations = self.generate_combinations(data)
             self.save_combinations(combinations, f"combine_rule_{label}")
         print("Long and Short combinations have been saved successfully.")

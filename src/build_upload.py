@@ -15,7 +15,7 @@ class BuildUploadData():
     def __init__(self, strategy_name):
         self.strategy_name_original = strategy_name
         self.strategy_name = strategy_name.replace('combine_rule','output') 
-        self.path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        self.path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
         self.folder_name = "output_single" if 'single' in self.strategy_name else 'output'
         self.file_path = os.path.join(self.path,self.folder_name,self.strategy_name)
         self.file_name = self.strategy_name.replace('output_single','merged_df').replace('output','merged_df')
@@ -174,19 +174,19 @@ class BuildUploadData():
         print()
 
     def upload(self,strategy_name):
-        my_file_path= os.path.join('upload',strategy_name,f'{strategy_name}.csv')
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
+        my_file_path= os.path.join(path,'upload',strategy_name,f'{strategy_name}.csv')
         target_sheetname='detail_long' if 'long' in strategy_name else 'detail_short'
         BuildUploadData.Upload2Gspread(my_file_path,target_sheetname, replace_values=False) 
-        my_file_path= os.path.join('upload',strategy_name,f'{"info"}.csv')
+        my_file_path= os.path.join(path,'upload',strategy_name,f'{"info"}.csv')
         target_sheetname='info_long' if 'long' in strategy_name else 'info_short'
         BuildUploadData.Upload2Gspread(my_file_path,target_sheetname, replace_values=False) 
-        my_file_path= os.path.join('upload',strategy_name,f'{"rule_description"}.csv')
+        my_file_path= os.path.join(path,'upload',strategy_name,f'{"rule_description"}.csv')
         target_sheetname='rule_description_long' if 'long' in strategy_name else 'rule_description_short'
         BuildUploadData.Upload2Gspread(my_file_path,target_sheetname, replace_values=False) 
 if __name__ == '__main__':
 
-    strategy_name_list = ['combine_rule_long_2','output_single_short_5']
-    strategy_name_list = ['combine_rule_long_172','combine_rule_short_135']
+    strategy_name_list = ['output_long_1','output_short_3']
     
     for strategy_name in strategy_name_list:
         obj_buildupload_data = BuildUploadData(strategy_name)

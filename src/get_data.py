@@ -4,8 +4,8 @@ from full_fred.fred import Fred
 from dotenv import load_dotenv
 import pandas as pd
 from datetime import datetime, timedelta
-
-load_dotenv()
+from pathlib import Path
+load_dotenv(Path('../.env'))  # Load environment variables from .env file
 
 class Crawl_data():
     def __init__(self,data=None,name=None,start_date=None, end_date=None,change_freq=None ,FREQ=None, days=None, columns_name=None,observation_start=None,realtime_start=None,Fred_file = None,Fred_path=None):
@@ -50,28 +50,10 @@ class Crawl_data():
     
 if __name__ == '__main__':
 
-    if 0:
-        obj = Crawl_data(
-            name = 'GDPC1',
-            observation_start = "2005-01-01",
-            realtime_start="1999-01-01",
-            days=1
-            )
-        df = obj.get_fred_data()
-        print(df)
-    if 0:
-        obj = Crawl_data(
-        name = 'T10YFF',
-        observation_start = "2005-01-01",
-        realtime_start="1999-01-01",
-         days=1
-        )
-        df = obj.get_fred_data()
-        print(df)
     
     if 1:
         symbol_list = ['GDPC1','T10YFF','CORESTICKM159SFRBATL','EFFR','UNRATE','UMCSENT','MORTGAGE30US','PAYEMS','PPIACO']
-        save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw_data')
+        save_path = Path(__file__).parent.parent / 'data' / 'raw_data'
         for symbol in symbol_list:
             obj = Crawl_data(
                 name = symbol,

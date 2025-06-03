@@ -8,9 +8,10 @@ from function_library import load_tensor, load_pickle
 import rule_library_username as rule_library
 import re
 
+
 class RuleEvaluator:
     def __init__(self, signal_file_name, combined_rule_info, output_folder_name, rule_index, longshort, device='cpu',strategy_name = None):
-        self.df = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)),signal_file_name), encoding='utf-8-sig')
+        self.df = pd.read_csv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data','need_data',signal_file_name), encoding='utf-8-sig')
         self.output_folder_name = output_folder_name
         self.rule_index = rule_index
         self.longshort = longshort
@@ -122,9 +123,9 @@ class RuleEvaluator:
         except:
             df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
         df.set_index('Date', inplace=True)
-        
-        rule_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rule')
-        measure_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'measure')
+        rule_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data','rule')
+        measure_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data','measure')
+
 
         # 從結構中提取數據
         rule_use = combined_rule_info["rule_use"]
@@ -186,7 +187,7 @@ class RuleEvaluator:
         results = RuleEvaluator.evaluate_rule(self.strategy_name,merged_df,self.longshort,measure_name_list_pure, rule_use,rule_describe,rule_weight)
 
         # 創建對應的輸出資料夾，保持編號一致
-        output_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),self.output_folder_name, f"{self.output_folder_name}_{self.longshort}_{self.rule_index}")
+        output_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data',self.output_folder_name, f"{self.output_folder_name}_{self.longshort}_{self.rule_index}")
         os.makedirs(output_folder_path, exist_ok=True)
 
         # 將結果保存為 .json 檔案
@@ -206,7 +207,7 @@ class RunEvaluate:
     def main_for_combine_rule(self,given_strategy_name = None):
         signal_file_name = "拐點標註檔.csv"
         output_folder = "output"
-        path =os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        path =os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
 
         combine_rule_path = os.path.join(path,"combine_rule")
         if given_strategy_name is None:
@@ -250,7 +251,7 @@ class RunEvaluate:
                 folder_name =  match.group(1) if match else run_strategy_name
                 if longshort in folder_name:
                     folder_name = folder_name.replace(f"_{longshort}",'')
-                json_files = os.path.join(folder_name,run_strategy_name,f"{run_strategy_name}.json")
+                json_files = os.path.join(path,folder_name,run_strategy_name,f"{run_strategy_name}.json")
                 with open(json_files, 'r', encoding='utf-8') as file:
                     combined_rule_info = json.load(file)
 
@@ -263,12 +264,11 @@ class RunEvaluate:
                     device = 'cpu',
                     strategy_name =  run_strategy_name
                 )
-# 單一的rule
+    # 單一的rule
     def main_for_single_rule(self):
         signal_file_name = "拐點標註檔.csv"
         output_folder = "output_single"
-        path =os.path.join(os.path.dirname(os.path.abspath(__file__)))
-
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
         rule_path = os.path.join(path,"rule")
         # 列出rule_path的檔案要是.pt結尾
         pt_files = [f for f in os.listdir(rule_path) if f.endswith(".pt")]
@@ -326,7 +326,7 @@ class RunEvaluate:
                         )
                         
     def build_combine_table(self,only_sigle_rule = False,given_strategy_name = None):
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'data')
         # 資料價名稱output_long_1 # long short 分開執行
         combine_rule_list = []
         if given_strategy_name is None:
@@ -366,28 +366,28 @@ class RunEvaluate:
                 # long short 分開成兩張表
                 
                 if only_sigle_rule:
-                    print(f"存檔 {os.path.join(path, f'single_table_{longshort}.csv')}")
-                    combine_table.loc[combine_table['longshort'] == longshort,:].to_csv(os.path.join(path, f"single_table_{longshort}.csv"), encoding='utf-8-sig', index=False)
+                    print(f"存檔 {os.path.join(path,'output_table', f'single_table_{longshort}.csv')}")
+                    combine_table.loc[combine_table['longshort'] == longshort,:].to_csv(os.path.join(path,'output_table', f"single_table_{longshort}.csv"), encoding='utf-8-sig', index=False)
                 else:
-                    print(f"存檔 {os.path.join(path, f'combine_table_{longshort}.csv')}")
-                    combine_table.loc[combine_table['longshort'] == longshort,:].to_csv(os.path.join(path, f"combine_table_{longshort}.csv"), encoding='utf-8-sig', index=False)
+                    print(f"存檔 {os.path.join(path,'output_table', f'combine_table_{longshort}.csv')}")
+                    combine_table.loc[combine_table['longshort'] == longshort,:].to_csv(os.path.join(path,'output_table', f"combine_table_{longshort}.csv"), encoding='utf-8-sig', index=False)
                 
         elif not given_strategy_name is None:
             for run_strategy_name in given_strategy_name:
                 folder_name = 'output_single' if 'single' in run_strategy_name else 'output'
                 longshort = 'long' if 'long' in run_strategy_name else 'short'
                 strategy_index = run_strategy_name.split("_")[-1]
-                json_files = os.path.join(folder_name,f"{folder_name}_{longshort}_{strategy_index}",f"{folder_name}_{longshort}_{strategy_index}.json")
+                json_files = os.path.join(path,folder_name,f"{folder_name}_{longshort}_{strategy_index}",f"{folder_name}_{longshort}_{strategy_index}.json")
                 with open(json_files, 'r', encoding='utf-8') as file:
                     combined_rule_info = json.load(file)
                 combine_rule_list.append(combined_rule_info)
             combine_table = pd.DataFrame(combine_rule_list)
-            print(f"存檔 {os.path.join(path, f'combine_table_long.csv')}")
-            combine_table.loc[combine_table['longshort'] == 'long',:].to_csv(os.path.join(path, f"combine_table_long.csv"), encoding='utf-8-sig', index=False)
-            print(f"存檔 {os.path.join(path, f'combine_table_short.csv')}")
-            combine_table.loc[combine_table['longshort'] == 'short',:].to_csv(os.path.join(path, f"combine_table_short.csv"), encoding='utf-8-sig', index=False)
-            print(f"存檔 {os.path.join(path, f'combine_table.csv')}")
-            combine_table.to_csv(os.path.join(path, f"combine_table.csv"), encoding='utf-8-sig', index=False)
+            print(f"存檔 {os.path.join(path, 'output_table', f'combine_table_long.csv')}")
+            combine_table.loc[combine_table['longshort'] == 'long',:].to_csv(os.path.join(path, 'output_table', f"combine_table_long.csv"), encoding='utf-8-sig', index=False)
+            print(f"存檔 {os.path.join(path, 'output_table', f'combine_table_short.csv')}")
+            combine_table.loc[combine_table['longshort'] == 'short',:].to_csv(os.path.join(path, 'output_table', f"combine_table_short.csv"), encoding='utf-8-sig', index=False)
+            print(f"存檔 {os.path.join(path, 'output_table', f'combine_table.csv')}")
+            combine_table.to_csv(os.path.join(path, 'output_table', f"combine_table.csv"), encoding='utf-8-sig', index=False)
 
                         
 if __name__ == '__main__':
@@ -406,8 +406,7 @@ if __name__ == '__main__':
         obj_RunEvaluate.main_for_single_rule() # 單一rule 
         obj_RunEvaluate.build_combine_table()
     if 1: # 組合 指定的
-        # run_strategy_name = ['combine_rule_long_2','combine_rule_single_long_1']
-        run_strategy_name = ['combine_rule_long_172','combine_rule_short_135']
+        run_strategy_name = ['combine_rule_single_long_1','combine_rule_single_short_3']
         obj_RunEvaluate = RunEvaluate()
         obj_RunEvaluate.main_for_combine_rule(given_strategy_name = run_strategy_name) # 合併的rule
         obj_RunEvaluate.build_combine_table(given_strategy_name = run_strategy_name)

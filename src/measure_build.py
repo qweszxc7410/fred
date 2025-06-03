@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import torch
 from function_library import * 
 import os
+from pathlib import Path
 
 def ffill_tensor(tensor_input,method = 1):
     # 確保 tensor_input 是浮點型態，才能處理 NaN
@@ -163,15 +164,12 @@ def create_tensor(symbol_files,data_path = "",save_path = ""):
             df.to_csv(output_path,encoding='utf-8-sig')
             
 if __name__ == '__main__':
-    # 使用示例
     
-    data_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'raw_data')
-    save_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'measure')
-    symbol_files_list = ['GDPC1.csv']
-    symbol_files_list = ['T10YFF.csv']
-    symbol_files_list = ['CORESTICKM159SFRBATL.csv']
+    # 使用範例
+    save_path = Path(__file__).parent.parent / 'data' / 'measure' # 確保資料夾存在
+    data_path = Path(__file__).parent.parent / 'data' / 'raw_data' # 確保資料夾存在
+
     symbol_files_list = ['GDPC1.csv','T10YFF.csv','EFFR.csv','CORESTICKM159SFRBATL.csv','UNRATE.csv','UMCSENT.csv','MORTGAGE30US.csv','PAYEMS.csv','PPIACO.csv']
-    # symbol_files_list = ['UMCSENT.csv']
     
     # UNRATE PAYEMS需另外確認
     if 1: # 製作GDPC1.pt
